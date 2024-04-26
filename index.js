@@ -28,7 +28,26 @@ async function run() {
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
 
-    const discoverCollection= client.db()
+    const discoverCollection = client
+      .db("DiscoverHaven")
+      .collection("destinations");
+
+    // CRUD operations for add tourists spots
+
+    // read all collection
+    app.get("/destinations", async (req, res) => {
+      const query = discoverCollection.find();
+      const result = await query.toArray();
+      res.send(result);
+    });
+
+    // create a collection
+    app.post("/destinations", async (req, res) => {
+      const newDestinations = req.body;
+      console.log(newDestinations);
+      const result = await discoverCollection.insertOne(newDestinations);
+      res.send(result);
+    });
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
