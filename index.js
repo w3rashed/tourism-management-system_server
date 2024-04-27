@@ -33,6 +33,10 @@ async function run() {
       .db("DiscoverHaven")
       .collection("destinations");
 
+    const countriesCollection = client
+      .db("DiscoverHaven")
+      .collection("countries");
+
     // CRUD operations for add tourists spots
 
     // read all collection
@@ -41,6 +45,8 @@ async function run() {
       const result = await query.toArray();
       res.send(result);
     });
+
+    
 
     // read a collection by id
     app.get("/destinations/:id", async (req, res) => {
@@ -98,6 +104,20 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await discoverCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // read all collection ass categories
+    app.get("/countries", async (req, res) => {
+      const query = countriesCollection.find();
+      const result = await query.toArray();
+      res.send(result);
+    });
+    // create a collection
+    app.post("/countries", async (req, res) => {
+      const newCountries = req.body;
+      console.log(newCountries);
+      const result = await countriesCollection.insertOne(newCountries);
       res.send(result);
     });
 
