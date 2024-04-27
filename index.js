@@ -9,8 +9,9 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const uri =
-  "mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.nrpddgz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+// const uri =
+//   "mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.nrpddgz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = "mongodb://localhost:27017";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -41,11 +42,62 @@ async function run() {
       res.send(result);
     });
 
+    // read a collection by id
+    app.get("/destinations/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await discoverCollection.findOne(query);
+      res.send(result);
+    });
+    // read a collection by email
+    app.get("/user/:email", async (req, res) => {
+      const result = await discoverCollection
+        .find({
+          user_email: req.params.email,
+        })
+        .toArray();
+      console.log(result);
+      res.send(result);
+    });
+
     // create a collection
     app.post("/destinations", async (req, res) => {
       const newDestinations = req.body;
       console.log(newDestinations);
       const result = await discoverCollection.insertOne(newDestinations);
+      res.send(result);
+    });
+
+    // update a collection
+    app.put("/destinations/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateSpot = req.body;
+      const spot = {
+        $set: {
+          user_name: updateSpot.user_name,
+          user_email: updateSpot.user_email,
+          spot_name: updateSpot.spot_name,
+          country_name: updateSpot.country_name,
+          spot_location: updateSpot.spot_location,
+          description: updateSpot.description,
+          average_cost: updateSpot.average_cost,
+          seasonality: updateSpot.seasonality,
+          travel_time: updateSpot.travel_time,
+          visitors_per_year: updateSpot.visitors_per_year,
+          photo_url: updateSpot.photo_url,
+        },
+      };
+      const result = await discoverCollection.updateOne(query, spot, options);
+      res.send(result);
+    });
+
+    // delete a collection
+    app.delete("/destinations/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await discoverCollection.deleteOne(query);
       res.send(result);
     });
 
