@@ -104,13 +104,13 @@ async function run() {
       res.send(result);
     });
 
-    // read all collection ass categories
+    // read all collection as categories
     app.get("/countries", async (req, res) => {
       const query = countriesCollection.find();
       const result = await query.toArray();
       res.send(result);
     });
-    // create a collection
+    // create a collection for country
     app.post("/countries", async (req, res) => {
       const newCountries = req.body;
       console.log(newCountries);
